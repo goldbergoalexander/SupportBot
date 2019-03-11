@@ -49,13 +49,71 @@ var option = {
 /*Start messaging */
 
 bot.on("text", (messages) => {
+	axios.post('http://93.188.161.182:4001/api/insertvalue1/',{
+											                   username: messages.from.first_name,
+                                                               userid: messages.from.id,
+	                                                           messagechatid: messages.chat.id,
+						                                       messageid : messages.id,
+															   messageproblem:messages.text,
+															   messagefixproblem:null
+
+
+										                        })
 	var fname = messages.chat.first_name.toUpperCase();
 	if (messages.text === '/add' || messages.text === '/start'){
 
 
 				bot.sendMessage(messages.chat.id, '``'+ '*'+ " Привіт " + ' ' + fname +  " Оберіть завдання  \ud83d\udc47" + '*' +'``', option1,{parse_mode: "Markdown",} )
 			}
+			//get statistic from bot
+			if (messages.text === '/stat'){
+		                                  var total = [];
+										  var datas=[];
+										  axios({ method: 'get',
+		                                  headers: {'Content-type': 'application/json; charset=utf8' },
+  	                                      url: ('http://93.188.161.182:4001/api/count/')})
+										                         .then(data=>data.data)
+															 	 .then((result)=>{
+																  total.push(result.data);
 
+										                }).catch(error => {throw error})
+														.then(()=>{
+															axios({ method: 'get',
+		                                  headers: {'Content-type': 'application/json; charset=utf8' },
+  	                                      url: ('http://93.188.161.182:4001/api/statistic/')})
+										                    .then(data=>data.data)
+															.then((resulto)=>{
+																
+															
+																
+															      console.log("this is resulto  " + resulto.data);
+			resulto.data.map(dat=>{datas.push('{' + '``'+ '*'+  '-Імя-:' + '*'+ '``'+ dat._id + '\n' + '``'+ '*'+ '-Записів-:' + '*'+ '``'+ dat.total_messages + '-'+ ' #' + '\n' +  '``'+ '*'+ '-Останній-:' + '*'+ '``'+ dat.last_message + '-'+ ' #' + '\n' + '``'+ '*'+ '-Час-:' + '*'+ '``'+ dat.time + '-'+ '}' + '\n')})
+																 
+																 if (resulto.data.length<=0) {
+											bot.sendMessage(messages.chat.id, '``'+ '*'+ "нажаль за Вашим запитом :  = > " + mess.text + " " + " нічого не знайдено   повторіть спробу" + '\n'+
+										'*'+ '``'+ '\n',option1,{parse_mode: "Markdown"} )
+										}
+                                        else {
+											
+
+										bot.sendMessage(messages.chat.id,
+										'Всього документів : ' + total + '\n' +
+										datas + '\n' +
+
+										'``'+ '*'+ 'Не знaйшли вирішення спробуйте уточнити пошук повторно \ud83d\udc47 '+ '*'+ '``'+
+										 '\n',option1,{parse_mode: "Markdown"} )
+															}
+
+
+
+															
+
+
+					  })
+                 })
+
+			}
+//get statistic from bot
 		/*
 	else if (messages.text === '/help'){
 		bot.sendMessage(messages.chat.id, '``'+ '*'+ " Привіт " + ' ' + fname +  " Оберіть завдання  \ud83d\udc47" + '*' +'``', option1).then(() => {

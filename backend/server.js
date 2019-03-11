@@ -43,6 +43,38 @@ app1.use(logger("dev"));
 
 // this is our get method
 // this method fetches all available data in our database
+//##################################   Statistic {Count problems}  ############################################################
+router.get("/count", (req, res) => {
+	//var Value = require("../client/src/App.js")
+		
+  dbo.find().count((err, data) => {
+	if (err) return res.json({ success: false, error: err });
+	 return  res.json({ success: true, data: data}),console.log('This is datas:' + '\n' + data);
+	
+  })
+  
+});
+//##################################   Statistic {Count problems}  ############################################################
+//##################################   Statistic  ############################################################
+router.get("/statistic", (req, res) => {
+	//var Value = require("../client/src/App.js")
+	  let datas = [];
+	dbo.aggregate([{$group : {_id :"$user.name", total_messages:{ $sum : 1}, last_message:{$last:"$message.text.problem"}, time:{$last: "$createdAt"}}}, { $sort: { "time": -1 } },]).toArray((err, data) => {	
+  //dbo.find({},{"message.text.problem": true}).limit(5).toArray((err, data) => {
+	if (err) return res.json({ success: false, error: err });
+	for (i=0;i<data.length;i++){
+		
+	datas.push(data[i])	;
+	
+	}
+    return  res.json({ success: true, data: datas}),console.log('This is datas:' + '\n' + Object.keys(datas[0]));
+	
+  })
+  
+});
+//##################################    Statistic #############################################################
+
+
 
 //##################################    Worked Code ############################################################
 router.get("/getvalue1/:input", (req, res) => {
@@ -53,7 +85,7 @@ router.get("/getvalue1/:input", (req, res) => {
 	//console.log('This is put' + ' ' + Object.values(put))
   let datas = [];
 	
-  dbo.find({$or:[{"message.text.problem": new RegExp(put)},{"message.text.fixproblem": new RegExp(put)}]}).limit(5).toArray((err, data) => {
+  dbo.find({$or:[{$and:[{"message.text.problem": new RegExp(put)},{"message.text.fixproblem": {$ne:null}}]},{"message.text.fixproblem": new RegExp(put)}]}).limit(5).toArray((err, data) => {
 	if (err) return res.json({ success: false, error: err });
 	for (i=0;i<data.length;i++){
 		
@@ -70,6 +102,26 @@ router.get("/getvalue1/:input", (req, res) => {
 //##################################    Insert VALUE #############################################################
 
 router.post("/insertvalue", (req, res) => {
+  let data = new Data();
+
+  const { username, userid,messagechatid,messageid,messageproblem,messagefixproblem } = req.body;
+  console.log (username);
+
+  data.user.name = username;
+  data.user.id = userid;
+  data.message.chat_id = messagechatid;
+  data.message.id = messageid;
+  data.message.text.problem = messageproblem;
+  data.message.text.fixproblem = messagefixproblem;
+  data.save(err => {
+    if (err) return res.json({ success: false, error: err });
+    return res.json({ success: true });
+  });
+});
+//##################################    Insert VALUE #############################################################
+//##################################    Insert ALL users #############################################################
+
+router.post("/insertvalue1", (req, res) => {
   let data = new Data();
 
   const { username, userid,messagechatid,messageid,messageproblem,messagefixproblem } = req.body;
