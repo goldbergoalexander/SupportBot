@@ -14,7 +14,7 @@ Promise.config({
 const API_PORT = 4001;
 const app1 = express();
 const router = express.Router();
-const dbRoute = "mongodb://use_teleg:BqgS9DJJ8B7rYSyBVZ@93.188.161.182:18063/test";
+const dbRoute = data_base_url;
 // connects our back end code with the database
 
 var options = { server: { socketOptions: { keepAlive: 30000 } } };
