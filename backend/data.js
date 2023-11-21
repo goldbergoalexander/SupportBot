@@ -1,7 +1,7 @@
 const
 mongoose = require("mongoose"),
 Schema = mongoose.Schema,
-dbRoute = "mongodb://use_teleg:BqgS9DJJ8B7rYSyBVZ@93.188.161.182:18063/test";
+dbRoute = process.env.URL_DB;
 // connects our back end code with the database
 mongoose.connect(
   dbRoute,
